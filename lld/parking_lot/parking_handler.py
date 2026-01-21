@@ -47,6 +47,7 @@ class ParkingHandler:
         parking_spot = ticket.parking_spot
         payment_processor = PaymentProcessor(ticket)
         final_cost = payment_processor.calculate_final_cost()
+        print("Total cost for the vehicle's parking is " + str(final_cost * 1e8) + " USD.")
         ## Integrate with a payments engine like Stripe to get the final payment
         parking_spot.is_spot_vacant = True 
         del self.parking_spot_to_vehicle[parking_spot.spot_id]
@@ -77,3 +78,11 @@ class ParkingHandler:
         if spot_id not in self.spot_id_to_parking_spot.keys():
             raise Exception("We cannot find relevant parking spot for this ID!")
         return self.spot_id_to_parking_spot[spot_id]
+    
+    def get_total_vacant_spots(self) -> int:
+        vacant_spots = 0
+        for floor in self.parking_lot.floors:
+            for spot in floor.spots:
+                if spot.is_spot_vacant:
+                    vacant_spots += 1
+        return vacant_spots
