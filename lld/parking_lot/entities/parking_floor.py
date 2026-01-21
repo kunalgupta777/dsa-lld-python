@@ -1,6 +1,6 @@
 from uuid import uuid4
-from lld.parking_lot.parking_spot import ParkingSpot
-from lld.parking_lot.vehicle import Vehicle
+from lld.parking_lot.entities.parking_spot import ParkingSpot
+from lld.parking_lot.entities.vehicle import Vehicle
 
 
 class ParkingFloor:

@@ -1,12 +1,11 @@
 
 
 from uuid import uuid4
-from lld.parking_lot import vehicle
-from lld.parking_lot.parking_floor import ParkingFloor
-from lld.parking_lot.parking_handler import ParkingHandler
-from lld.parking_lot.parking_lot import ParkingLot
-from lld.parking_lot.parking_spot import ParkingSpot
-from lld.parking_lot.vehicle import Vehicle, VehicleType
+from lld.parking_lot.entities.parking_floor import ParkingFloor
+from lld.parking_lot.parking_service import ParkingService
+from lld.parking_lot.entities.parking_lot import ParkingLot
+from lld.parking_lot.entities.parking_spot import ParkingSpot
+from lld.parking_lot.entities.vehicle import Vehicle, VehicleType
 
 import random
 
@@ -36,29 +35,29 @@ def create_vehicles(count = 51) -> list[Vehicle]:
 
 if __name__ == "__main__":
     parking_lot = ParkingLot(floors=create_parking_floors())
-    parking_handler = ParkingHandler(parking_lot=parking_lot)
+    parking_service = ParkingService(parking_lot=parking_lot)
     vehicles = create_vehicles()
     tickets = []
     for id, vehicle in enumerate(vehicles):
         print("#" + str(id+1) + ": Attempting to park vehicle:" + vehicle.license_number)
         try: 
-            ticket = parking_handler.park_vehicle(vehicle=vehicle)
+            ticket = parking_service.park_vehicle(vehicle=vehicle)
             tickets.append(ticket)
             # print(str(id) + " Ticket received!", ticket.__dict__)
         except Exception as e:
             print("Some error occured while parking this vehicle!", e)
-        print("Total vacant spots:" + str(parking_handler.get_total_vacant_spots()))
+        print("Total vacant spots:" + str(parking_service.get_total_vacant_spots()))
     
     for ticket in tickets:
         vehicle = ticket.vehicle
-        spot = parking_handler.find_parking_spot_from_license_number(vehicle.license_number)
+        spot = parking_service.find_parking_spot_from_license_number(vehicle.license_number)
         print("Vehicle " + vehicle.license_number + " is parked at: " + str(spot.spot_id))
         print("#" + str(id+1) + ": Attempting to unpark vehicle:" + ticket.vehicle.license_number)
         try:
-            parking_handler.unpark_vehicle(ticket=ticket)
+            parking_service.unpark_vehicle(ticket=ticket)
         except Exception as e:
             print("Error unparking vehicle!", e)
-        print("Total vacant spots:" + str(parking_handler.get_total_vacant_spots()))
+        print("Total vacant spots:" + str(parking_service.get_total_vacant_spots()))
 
 
 

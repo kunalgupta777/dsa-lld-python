@@ -1,5 +1,5 @@
 from uuid import uuid4
-from lld.parking_lot.parking_floor import ParkingFloor
+from lld.parking_lot.entities.parking_floor import ParkingFloor
 
 
 class ParkingLot:

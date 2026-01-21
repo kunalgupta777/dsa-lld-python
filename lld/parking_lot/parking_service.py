@@ -1,16 +1,14 @@
-from lld.parking_lot import parking_spot
-from lld.parking_lot import payment_processor
-from lld.parking_lot.parking_floor import ParkingFloor
-from lld.parking_lot.parking_lot import ParkingLot
-from lld.parking_lot.parking_spot import ParkingSpot
-from lld.parking_lot.payment_processor import PaymentProcessor
-from lld.parking_lot.ticket import Ticket
-from lld.parking_lot.vehicle import Vehicle
+from lld.parking_lot.entities.parking_floor import ParkingFloor
+from lld.parking_lot.entities.parking_lot import ParkingLot
+from lld.parking_lot.entities.parking_spot import ParkingSpot
+from lld.parking_lot.pricing.strategy_resolver import StrategyResolver
+from lld.parking_lot.entities.ticket import Ticket
+from lld.parking_lot.entities.vehicle import Vehicle
 
 import datetime
 
 
-class ParkingHandler:
+class ParkingService:
     def __init__(self, parking_lot: ParkingLot) -> None:
         self.parking_lot = parking_lot 
         self.floors = { floor.floor_level: floor for floor in self.parking_lot.floors }
@@ -45,14 +43,18 @@ class ParkingHandler:
         ticket.exit_time = datetime.datetime.now()
         vehicle = ticket.vehicle
         parking_spot = ticket.parking_spot
-        payment_processor = PaymentProcessor(ticket)
-        final_cost = payment_processor.calculate_final_cost()
+        final_cost = self._get_ticket_cost(ticket=ticket)
         print("Total cost for the vehicle's parking is " + str(final_cost * 1e8) + " USD.")
         ## Integrate with a payments engine like Stripe to get the final payment
         parking_spot.is_spot_vacant = True 
         del self.parking_spot_to_vehicle[parking_spot.spot_id]
         del self.vehicle_to_parking_spot[vehicle.license_number]
         print("Vehicle unparked!")
+    
+    def _get_ticket_cost(self, ticket: Ticket) -> float:
+        strategy_resolver = StrategyResolver(ticket=ticket)
+        strategy = strategy_resolver.get_pricing_strategy()
+        return strategy.calculate_final_cost()
 
     
     def _find_nearest_vacant_spot(self, vehicle: Vehicle) -> ParkingSpot:

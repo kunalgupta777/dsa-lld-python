@@ -1,6 +1,6 @@
 from uuid import uuid4
 
-from lld.parking_lot.vehicle import VehicleType
+from lld.parking_lot.entities.vehicle import VehicleType
 
 class ParkingSpot:
     def __init__(self, hourly_rate: float, vehicle_types: list[VehicleType]) -> None:
